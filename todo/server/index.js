@@ -16,22 +16,67 @@ app.post("/tasks", async (req, res) => {
             description
         } = req.body;
         const newTask = await pool.query(
-            "INSERT INTO tasks (description) VALUES($1)",
+            "INSERT INTO tasks (description) VALUES($1) RETURNING *",
             [description]
         );
-
-        res.json(newTask);
+        res.json(newTask.rows[0]);
     } catch (err) {
         console.error(err.message);
     }
 });
-// get all tasks
 
-// get single task
+// get all tasks
+app.get("/tasks", async (req, res) => {
+    try {
+        const allTasks = await pool.query("SELECT * FROM tasks");
+        res.json(allTasks.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+// get task by id
+app.get("/tasks/:id", async (req, res) => {
+    try {
+        const {
+            id
+        } = req.params;
+        const task = await pool.query("SELECT * FROM tasks WHERE tasks_id = $1", [id]);
+        res.json(task.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+
+});
 
 // update a task
+app.put("/tasks/:id", async (req, res) => {
+    try {
+        const {
+            id
+        } = req.params;
+        const {
+            description
+        } = req.body;
+        const updateTask = await pool.query("UPDATE tasks SET description = $1 WHERE tasks_id = $2", [description, id])
+        res.json('Task was updated!');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
 
 // delete a task
+app.delete('/tasks/:id', async (req, res) => {
+    try {
+        const {
+            id
+        } = req.params;
+        const deleteTask = await pool.query("DELETE FROM tasks WHERE tasks_id = $1", [id]);
+        res.json('Task was deleted!');
+    } catch (err) {
+        console.error(err.message);
+    }
+})
 
 app.listen(5000, () => {
     console.log('server currently running on port 5000!');
