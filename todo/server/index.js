@@ -79,5 +79,5 @@ app.delete('/tasks/:id', async (req, res) => {
 })
 
 app.listen(5000, () => {
-    console.log('server currently running on port 5000!');
+    console.log('server initialized on port 5000!');
 })
